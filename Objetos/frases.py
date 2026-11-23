@@ -12,6 +12,8 @@ def quitar_tildes(texto):
     """Devuelve el texto en minúsculas y sin tildes, para comparar palabras.
 
     Así "Adiós", "adios" y "ADIÓS" se consideran la misma palabra.
+
+    Eficiencia: Hace 6 reemplazos (uno por letra con tilde); como los textos son cortos, es rápido.
     """
     texto = texto.lower()
     cambios = {"á": "a", "é": "e", "í": "i", "ó": "o", "ú": "u", "ü": "u"}
@@ -25,6 +27,8 @@ def separar_palabras(texto):
 
     Las palabras se devuelven tal como el usuario las escribió (con sus
     mayúsculas), para poder guardar nombres como "Alicia" correctamente.
+
+    Eficiencia: Hace un reemplazo por cada signo y un solo split().
     """
     signos = "¿?¡!.,;:\"()"  
     for signo in signos:
@@ -39,16 +43,24 @@ class GrupoFrases:
         nombre (str): nombre del grupo, por ejemplo "Pésame".
         prioridad (int): 1 es la más importante; 0 es el grupo conversacional.
         frases (list): lista de strings con las frases del grupo.
+
+    Eficiencia: Guarda las frases en una lista, que se recorre en orden.
     """
 
     def __init__(self, nombre, prioridad, frases):
-        """Constructor del grupo de frases."""
+        """Constructor del grupo de frases.
+
+        Eficiencia: Solo guarda tres datos.
+        """
         self.nombre = nombre
         self.prioridad = prioridad
         self.frases = frases
 
     def __str__(self):
-        """Muestra el grupo de forma legible."""
+        """Muestra el grupo de forma legible.
+
+        Eficiencia: len() de una lista es inmediato.
+        """
         return f"[{self.prioridad}] {self.nombre} ({len(self.frases)} frases)"
 
 
@@ -58,10 +70,15 @@ class GrupoEntrada(GrupoFrases):
     Hereda de GrupoFrases y agrega el comodín ('*'). Si una frase tiene el
     comodín, la palabra que viene justo después en el texto del usuario se
     guarda (por ejemplo "es mi *" con "él es mi jefe" guarda "jefe").
+
+    Eficiencia: Como los mensajes y las frases son cortos, comparar palabra por palabra es rápido.
     """
 
     def __init__(self, nombre, prioridad, frases, comodin=None):
-        """Constructor: llama al constructor del padre con super()."""
+        """Constructor: llama al constructor del padre con super().
+
+        Eficiencia: Reutiliza el constructor del padre con super().
+        """
         super().__init__(nombre, prioridad, frases)
         self.comodin = comodin
 
@@ -74,6 +91,8 @@ class GrupoEntrada(GrupoFrases):
         - (True, "Alicia") si está y tiene comodín: la palabra siguiente.
         Si la frase tiene comodín pero el texto se acaba antes de la palabra,
         se considera que NO coincide (así lo pide el enunciado).
+
+        Eficiencia: Recorre las palabras del usuario una vez y se detiene apenas encuentra la frase.
         """
         partes = quitar_tildes(frase).split()
         tiene_comodin = False
@@ -101,6 +120,8 @@ class GrupoEntrada(GrupoFrases):
 
         Devuelve una tupla (frase, palabra_comodin) con la primera frase que
         coincida, o (None, "") si ninguna coincide.
+
+        Eficiencia: Se detiene en la primera frase que coincide, no revisa las demás.
         """
         for frase in self.frases:
             encontrada, palabra = self.buscar_frase(frase, palabras)
@@ -113,6 +134,8 @@ class GrupoEntrada(GrupoFrases):
 
         Sirve para cuando el usuario menciona varias personas a la vez,
         por ejemplo "mi mamá y mi abuela". Devuelve una lista de tuplas.
+
+        Eficiencia: Revisa todas las frases del grupo porque necesita encontrar a todas las personas mencionadas; solo se usa con el grupo Freudiano.
         """
         encontradas = []
         for frase in self.frases:
@@ -123,8 +146,14 @@ class GrupoEntrada(GrupoFrases):
 
 
 class GrupoSalida(GrupoFrases):
-    """Grupo de mensajes que ELIZA puede responder. Hereda de GrupoFrases."""
+    """Grupo de mensajes que ELIZA puede responder. Hereda de GrupoFrases.
+
+    Eficiencia: Elegir una frase al azar no necesita recorrer la lista.
+    """
 
     def elegir_respuesta(self):
-        """Elige uno de los mensajes del grupo al azar con el módulo random."""
+        """Elige uno de los mensajes del grupo al azar con el módulo random.
+
+        Eficiencia: random.choice escoge directo, sin recorrer la lista.
+        """
         return random.choice(self.frases)

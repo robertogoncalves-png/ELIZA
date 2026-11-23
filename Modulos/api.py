@@ -8,10 +8,15 @@ class ConexionAPI:
 
     Atributos:
         url_base (str): dirección donde están los archivos JSON.
+
+    Eficiencia: Solo guarda la dirección; cada archivo se descarga una sola vez al iniciar el programa.
     """
 
     def __init__(self):
-        """Constructor con la dirección del repositorio."""
+        """Constructor con la dirección del repositorio.
+
+        Eficiencia: Solo guarda un texto.
+        """
         self.url_base = "https://raw.githubusercontent.com/FernandoSapient/BPTSP05_2627-1/main/"
 
     def descargar(self, nombre_archivo):
@@ -19,6 +24,8 @@ class ConexionAPI:
 
         Revisa que la respuesta sea correcta (código 200). Si no hay internet
         o la respuesta falla, devuelve None en vez de cerrar el programa.
+
+        Eficiencia: Hace una sola solicitud por archivo; el timeout evita que el programa se quede esperando para siempre.
         """
         url = self.url_base + nombre_archivo
         try:

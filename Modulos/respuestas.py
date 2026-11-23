@@ -13,10 +13,15 @@ class ConstructorRespuestas:
         preguntas_lugar_usuario, preguntas_lugar_relacion (GrupoSalida):
             preguntas para completar los datos (de personas.json y lugares.json).
         confirmaciones (GrupoSalida): mensajes para decir que un dato se guardo.
+
+    Eficiencia: Los grupos de salida se guardan en un diccionario por nombre para encontrarlos directo, sin recorrer una lista.
     """
 
     def __init__(self, datos_salida, datos_personas, datos_lugares):
-        """Crea los grupos de salida a partir de los diccionarios de la API."""
+        """Crea los grupos de salida a partir de los diccionarios de la API.
+
+        Eficiencia: Recorre salida.json una sola vez al iniciar; después no se vuelve a procesar.
+        """
         self.grupos = {}
         for nombre in datos_salida:
             info = datos_salida[nombre]
@@ -41,6 +46,8 @@ class ConstructorRespuestas:
         """Devuelve un mensaje al azar del grupo indicado (por ejemplo "Pésame").
 
         Si el grupo no existe, usa el grupo "Conversacional".
+
+        Eficiencia: Buscar en el diccionario por nombre es directo, no recorre los grupos.
         """
         if nombre_grupo in self.grupos:  # evita error si el nombre no existe
             return self.grupos[nombre_grupo].elegir_respuesta()
@@ -51,6 +58,8 @@ class ConstructorRespuestas:
 
         Para el usuario: "¿Cómo te llamas?" o "¿De dónde eres?".
         Para otra persona: "Háblame de tu abuela. ¿Cómo se llama?".
+
+        Eficiencia: Solo hace dos comparaciones y escoge una frase al azar.
         """
         if isinstance(persona, Usuario):  # al usuario se le pregunta directo
             if dato == "nombre":
@@ -64,13 +73,18 @@ class ConstructorRespuestas:
         return f"Háblame de {persona.como_referirse()}. {pregunta}"
 
     def confirmar(self):
-        """Mensaje para avisar que el dato se guardó."""
+        """Mensaje para avisar que el dato se guardó.
+
+        Eficiencia: Escoge una frase al azar sin recorrer la lista.
+        """
         return self.confirmaciones.elegir_respuesta()
 
     def mencionar_conocida(self, persona):
         """Mensaje cuando el usuario vuelve a nombrar a alguien que ya conocemos.
 
         Ejemplo: "¿Tu abuela llamada Alicia, de Valencia?"
+
+        Eficiencia: Solo hace unas pocas comparaciones y une textos.
         """
         if persona.relacion.endswith("a") or persona.relacion.endswith("á"):  # abuela, tía, mamá
             llamado = "llamada"

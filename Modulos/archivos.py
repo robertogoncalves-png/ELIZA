@@ -22,19 +22,26 @@ def ruta(nombre_archivo):
     """Devuelve la dirección completa del archivo dentro de la carpeta Basededatos.
 
     Si la carpeta no existe (por ejemplo, la borraron), la crea.
+
+    Eficiencia: makedirs con exist_ok no repite trabajo si la carpeta ya existe.
     """
     os.makedirs(CARPETA_DATOS, exist_ok=True)  # exist_ok: no da error si ya existe
     return os.path.join(CARPETA_DATOS, nombre_archivo)
 
 
 class ManejadorArchivos:
-    """Lee y escribe los archivos .txt con la información de las personas."""
+    """Lee y escribe los archivos .txt con la información de las personas.
+
+    Eficiencia: Solo abre el archivo dos veces por sesión: al cargar (cuando el usuario dice su nombre) y al guardar (al despedirse), no en cada mensaje.
+    """
 
     def guardar(self, base, nombre_archivo):
         """Escribe todas las personas de la base en el archivo (modo 'w').
 
         Si el archivo ya existía, se reemplaza, porque la base ya incluye
         lo que se había cargado de él. Devuelve True si se pudo guardar.
+
+        Eficiencia: Recorre la lista de personas una sola vez y escribe todo de una vez.
         """
         try:
             # "w" reescribe el archivo completo: así las personas no se repiten
@@ -51,6 +58,8 @@ class ManejadorArchivos:
 
         Si el archivo no existe, devuelve None. Las líneas mal escritas
         (que no tienen 3 partes) se ignoran para no romper el programa.
+
+        Eficiencia: Lee el archivo una sola vez y recorre cada línea una vez.
         """
         try:
             with open(ruta(nombre_archivo), "r", encoding="utf-8") as archivo:

@@ -9,6 +9,8 @@ def pedir_opcion(minimo, maximo):
 
     Si el usuario escribe letras o un número fuera de rango, se muestra
     el error y se vuelve a pedir (el programa no se cierra).
+
+    Eficiencia: Valida con isdigit() antes de convertir con int(), así no hace falta try/except y el ciclo solo se repite si el usuario se equivoca.
     """
     while True:
         texto = input("Elige una opción: ").strip()
@@ -23,7 +25,10 @@ def pedir_opcion(minimo, maximo):
 
 
 def ver_archivo():
-    """Pide el nombre de un usuario y muestra las personas guardadas en su archivo."""
+    """Pide el nombre de un usuario y muestra las personas guardadas en su archivo.
+
+    Eficiencia: Lee el archivo una sola vez y recorre la lista de personas una vez para mostrarla.
+    """
     nombre = input("Nombre del usuario (deja vacío para 'usuario'): ").strip()
     if nombre == "":
         nombre = "usuario"  # mismo nombre que usa ELIZA si nadie se presentó
@@ -38,7 +43,10 @@ def ver_archivo():
 
 
 def main():
-    """Descarga los datos con la API y muestra el menú hasta que el usuario salga."""
+    """Descarga los datos con la API y muestra el menú hasta que el usuario salga.
+
+    Eficiencia: Las frases se descargan una sola vez al inicio y se reutilizan en todas las sesiones.
+    """
     print("Conectando con el repositorio de frases...")
     eliza = Eliza()
     if not eliza.cargar_datos():  # sin las frases ELIZA no puede conversar
