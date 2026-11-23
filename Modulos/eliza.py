@@ -1,4 +1,4 @@
-"""Contiene la clase Eliza, que lleva la conversación con el usuario."""
+"""Contiene la clase Eliza, que lleva la conversación con el usuario"""
 
 from Modulos.api import ConexionAPI
 from Modulos.archivos import ManejadorArchivos
@@ -8,27 +8,27 @@ from Objetos.personas import BaseConocimiento, Usuario
 
 
 class Eliza:
-    """El chatbot ELIZA.
+    """El chatbot eliza
 
     Atributos:
-        api (ConexionAPI): para descargar las frases de GitHub.
-        archivos (ManejadorArchivos): para guardar y cargar personas.
-        base (BaseConocimiento): personas de la conversación actual.
-        grupos_entrada (list): los 12 GrupoEntrada ordenados por prioridad.
-        grupo_despedida (GrupoEntrada): grupo de prioridad 1 (termina el programa).
-        grupo_personas (GrupoEntrada): grupo de prioridad 3 (Freudiano, se revisa siempre).
-        reconocedores (dict): GrupoEntrada para reconocer nombres, lugares y gentilicios.
-        respuestas (ConstructorRespuestas): arma los mensajes de salida.
-        pendiente_persona (Persona): persona a la que se le preguntó un dato.
-        pendiente_dato (str): dato preguntado ("nombre" o "lugar") o None.
+        api (ConexionAPI): para descargar las frases de GitHub
+        archivos (ManejadorArchivos): para guardar y cargar personas
+        base (BaseConocimiento): personas de la conversación actual
+        grupos_entrada (list): los 12 GrupoEntrada ordenados por prioridad
+        grupo_despedida (GrupoEntrada): grupo de prioridad 1 (termina el programa)
+        grupo_personas (GrupoEntrada): grupo de prioridad 3 (Freudiano, se revisa siempre)
+        reconocedores (dict): GrupoEntrada para reconocer nombres, lugares y gentilicios
+        respuestas (ConstructorRespuestas): arma los mensajes de salida
+        pendiente_persona (Persona): persona a la que se le preguntó un dato
+        pendiente_dato (str): dato preguntado ("nombre" o "lugar") o None
 
-    Eficiencia: Las frases se descargan y se preparan una sola vez en cargar_datos(); en cada mensaje solo se buscan.
+    Eficiencia: Las frases se descargan y se preparan una sola vez en cargar_datos(), en cada mensaje solo se buscan
     """
 
     def __init__(self):
-        """Constructor: crea los objetos auxiliares. Los datos se cargan con cargar_datos().
+        """Constructor: crea los objetos auxiliares. Los datos se cargan con cargar_datos()
 
-        Eficiencia: Solo crea objetos vacíos; lo pesado se hace en cargar_datos().
+        Eficiencia: Solo crea objetos vacíos; lo pesado se hace en cargar_datos()
         """
         self.api = ConexionAPI()
         self.archivos = ManejadorArchivos()
@@ -38,15 +38,15 @@ class Eliza:
         self.grupo_personas = None
         self.reconocedores = {}
         self.respuestas = None
-        self.pendiente_persona = None  # persona a la que ELIZA le hizo una pregunta 
+        self.pendiente_persona = None  # persona a la que eliza le hizo una pregunta 
         self.pendiente_dato = None     # dato que se le pregunto, ya nombre o lugar
 
     def cargar_datos(self):
-        """Descarga los 4 JSON con la API y crea todos los grupos de frases.
+        """Descarga los 4 JSON con la API y crea todos los grupos de frases
 
-        Devuelve True si todo se cargó bien, o False si hubo un error.
+        Devuelve True si todo se cargó bien, o False si hubo un error
 
-        Eficiencia: Descarga los 4 archivos una sola vez. Ordenar con dos for revisa 12 x 12 = 144 veces, que es muy poco.
+        Eficiencia: Descarga los 4 archivos una sola vez. Ordenar con dos for revisa 12 x 12 = 144 veces, que es muy poco
         """
         entrada = self.api.descargar("entrada.json")
         salida = self.api.descargar("salida.json")
@@ -90,23 +90,23 @@ class Eliza:
         return True
 
     def reiniciar(self):
-        """Borra la información de la conversación anterior para empezar una nueva.
+        """Borra la información de la conversación anterior para empezar una nueva
 
-        Eficiencia: Solo crea una base nueva.
+        Eficiencia: Solo crea una base nueva
         """
         self.base = BaseConocimiento()
         self.pendiente_persona = None
         self.pendiente_dato = None
 
     def conversar(self):
-        """Ciclo principal de la conversación: lee, responde, y repite hasta la despedida.
+        """Ciclo principal de la conversación: lee, responde, y repite hasta la despedida
 
-        Escribir "/personas" muestra las personas guardadas hasta el momento.
+        Escribir "/personas" muestra las personas guardadas hasta el momento
 
-        Eficiencia: Hace una sola llamada a responder() por cada mensaje.
+        Eficiencia: Hace una sola llamada a responder() por cada mensaje
         """
-        print("\nELIZA: Hola, soy ELIZA. ¿Que te trae por aquí hoy?")
-        print("       (Para terminar, despidete. Escribe /personas para ver lo que sé.)")
+        print("\nELIZA: Hola, soy ELIZA. ¿Que te trae por aqui hoy?")
+        print("       (Para terminar, despidete. Escribe /personas para ver lo que sé)")
         terminar = False
         while not terminar:
             texto = input("Tú: ").strip()
@@ -117,21 +117,21 @@ class Eliza:
             print("ELIZA:", mensaje)
 
     def responder(self, texto):
-        """Decide la respuesta de ELIZA para lo que escribió el usuario.
+        """Decide la respuesta de ELIZA para lo que escribió el usuario
 
         Orden de revisión:
-        1. Despedida (prioridad 1): guarda el archivo y termina.
-        2. Personas (prioridad 3): SIEMPRE se revisan para registrar a quien se nombre.
-        3. Si ELIZA había hecho una pregunta, se guarda la respuesta.
-        4. Grupos de prioridad 1 a 12: se usa el primero que coincida.
-        5. Si nada coincide: se pregunta un dato faltante o se conversa.
-        Devuelve una tupla (mensaje, terminar).
+        1. Despedida (prioridad 1): guarda el archivo y termina
+        2. Personas (prioridad 3): SIEMPRE se revisan para registrar a quien se nombre
+        3. Si ELIZA había hecho una pregunta, se guarda la respuesta
+        4. Grupos de prioridad 1 a 12: se usa el primero que coincida
+        5. Si nada coincide: se pregunta un dato faltante o se conversa
+        Devuelve una tupla (mensaje, terminar)
 
-        Eficiencia: Revisa los grupos en orden de prioridad y se detiene en el primero que coincide.
+        Eficiencia: Revisa los grupos en orden de prioridad y se detiene en el primero que coincide
         """
         palabras = separar_palabras(texto)
         if len(palabras) == 0:  # validación: mensaje vacío
-            return ("No escribiste nada. Puedes contarme lo que quieras.", False)
+            return ("No escribiste nada. Puedes contarme lo que quieras", False)
 
         # 1. Despedida
         frase, palabra = self.grupo_despedida.buscar(palabras)
@@ -157,12 +157,12 @@ class Eliza:
         return (self.preguntar_o_conversar(), False)
 
     def revisar_personas(self, palabras):
-        """Busca las Frases Clave de personas (prioridad 3) y registra a cada persona.
+        """Busca las Frases Clave de personas (prioridad 3) y registra a cada persona
 
-        "mi abuela" -> relación "abuela".  "es mi jefe" -> relación "jefe".
-        Devuelve la lista de personas mencionadas en este mensaje.
+        "mi abuela" -> relación "abuela".  "es mi jefe" -> relación "jefe"
+        Devuelve la lista de personas mencionadas en este mensaje
 
-        Eficiencia: Revisa las frases del Freudiano una vez, y agregar() evita guardar personas repetidas.
+        Eficiencia: Revisa las frases del Freudiano una vez, y agregar() evita guardar personas repetidas
         """
         sinonimos = {"mamá": "madre", "papá": "padre"}  # misma persona, distinta palabra
         mencionadas = []
@@ -182,12 +182,12 @@ class Eliza:
         return mencionadas
 
     def respuesta_personas(self, mencionadas):
-        """Respuesta cuando el usuario nombra a un familiar (prioridad 3).
+        """Respuesta cuando el usuario nombra a un familiar (prioridad 3)
 
         Si ya conocemos el nombre de esa persona, se sobreescribe el mensaje
-        Freudiano por uno como "¿Tu abuela llamada Alicia?".
+        Freudiano por uno como "¿Tu abuela llamada Alicia?"
 
-        Eficiencia: Se detiene en la primera persona conocida.
+        Eficiencia: Se detiene en la primera persona conocida
         """
         for persona in mencionadas:
             if persona.nombre != "":
@@ -195,15 +195,15 @@ class Eliza:
         return self.respuestas.respuesta_de_grupo(self.grupo_personas.nombre)
 
     def guardar_dato(self, palabras):
-        """Guarda la respuesta del usuario al dato que ELIZA preguntó.
+        """Guarda la respuesta del usuario al dato que ELIZA preguntó
 
-        Nombre: se buscan las frases para reconocer nombres ("me llamo *");
+        Nombre: se buscan las frases para reconocer nombres ("me llamo *"),
         si no hay ninguna, se presume que la primera palabra es el nombre.
-        Lugar: se buscan las frases de lugar ("de *") y gentilicio ("es *");
+        Lugar: se buscan las frases de lugar ("de *") y gentilicio ("es *"),
         si no hay ninguna, se toma la última palabra.
-        Si el dato es el nombre del usuario, se carga su archivo anterior.
+        Si el dato es el nombre del usuario, se carga su archivo anterior
 
-        Eficiencia: Solo busca en el reconocedor que hace falta (nombre, o lugar y luego gentilicio).
+        Eficiencia: Solo busca en el reconocedor que hace falta (nombre, o lugar y luego gentilicio)
         """
         persona = self.pendiente_persona
         dato = self.pendiente_dato
@@ -232,11 +232,11 @@ class Eliza:
         return self.respuestas.confirmar()
 
     def cargar_usuario(self):
-        """Busca el archivo con el nombre del usuario y, si existe, carga sus datos.
+        """Busca el archivo con el nombre del usuario y, si existe, carga sus datos
 
-        Los datos de la conversación actual tienen prioridad sobre los del archivo.
+        Los datos de la conversación actual tienen prioridad sobre los del archivo
 
-        Eficiencia: Lee el archivo una sola vez, cuando el usuario dice su nombre.
+        Eficiencia: Lee el archivo una sola vez, cuando el usuario dice su nombre
         """
         usuario = self.base.usuario
         personas_archivo = self.archivos.cargar(usuario.nombre_archivo())
@@ -244,16 +244,16 @@ class Eliza:
             return f"Mucho gusto, {usuario.nombre}. " + self.respuestas.confirmar()
         self.base.combinar(personas_archivo)  # lo de hoy tiene prioridad sobre el archivo
         return (f"¡Qué bueno verte de nuevo, {usuario.nombre}! "
-                "Recuerdo lo que me contaste la última vez. Continúa.")
+                "Recuerdo lo que me contaste la última vez. Continúa")
 
     def preguntar_o_conversar(self):
-        """Se usa cuando no hay ninguna Frase Clave en el mensaje.
+        """Se usa cuando no hay ninguna Frase Clave en el mensaje
 
         Primero pregunta lo que falte del usuario (nombre, luego lugar), después
         lo que falte de las demás personas, y si todo está completo usa un
         mensaje del grupo Conversacional (prioridad 0).
 
-        Eficiencia: Primero revisa al usuario y solo si está completo recorre a las demás personas.
+        Eficiencia: Primero revisa al usuario y solo si está completo recorre a las demás personas
         """
         persona = self.base.usuario
         dato = persona.dato_faltante()
@@ -268,9 +268,9 @@ class Eliza:
         return self.respuestas.preguntar(persona, dato)
 
     def despedirse(self):
-        """Guarda la información en el archivo del usuario y devuelve la despedida.
+        """Guarda la informacion en el archivo del usuario y devuelve la despedida.
 
-        Eficiencia: El archivo se escribe una sola vez, al final, y no en cada mensaje.
+        Eficiencia: El archivo se escribe una sola vez, al final, y no en cada mensaje
         """
         mensaje = self.respuestas.respuesta_de_grupo(self.grupo_despedida.nombre)
         nombre_archivo = self.base.usuario.nombre_archivo()

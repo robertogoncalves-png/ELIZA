@@ -1,45 +1,45 @@
-"""Descarga los archivos JSON de frases clave desde GitHub usando requests."""
+"""Descarga los archivos JSON de frases clave desde GitHub usando requests"""
 
 import requests
 
 
 class ConexionAPI:
-    """Se conecta al repositorio GitHub y descarga los JSON con las frases.
+    """Se conecta al repositorio GitHub y descarga los JSON con las frases
 
     Atributos:
-        url_base (str): dirección donde están los archivos JSON.
+        url_base (str): dirección donde están los archivos JSON
 
-    Eficiencia: Solo guarda la dirección; cada archivo se descarga una sola vez al iniciar el programa.
+    Eficiencia: Solo guarda la dirección; cada archivo se descarga una sola vez al iniciar el programa
     """
 
     def __init__(self):
-        """Constructor con la dirección del repositorio.
+        """Constructor con la dirección del repositorio
 
-        Eficiencia: Solo guarda un texto.
+        Eficiencia: Solo guarda un texto
         """
         self.url_base = "https://raw.githubusercontent.com/FernandoSapient/BPTSP05_2627-1/main/"
 
     def descargar(self, nombre_archivo):
-        """Hace la solicitud GET a la API y devuelve el JSON como diccionario.
+        """Hace la solicitud GET a la API y devuelve el JSON como diccionario
 
         Revisa que la respuesta sea correcta (código 200). Si no hay internet
-        o la respuesta falla, devuelve None en vez de cerrar el programa.
+        o la respuesta falla, devuelve None en vez de cerrar el programa
 
-        Eficiencia: Hace una sola solicitud por archivo; el timeout evita que el programa se quede esperando para siempre.
+        Eficiencia: Hace una sola solicitud por archivo; el timeout evita que el programa se quede esperando para siempre
         """
         url = self.url_base + nombre_archivo
         try:
             respuesta = requests.get(url, timeout=10)  # timeout: no esperar para siempre
         except requests.exceptions.RequestException:
-            print(f"Error: no se pudo conectar a internet para descargar {nombre_archivo}.")
+            print(f"Error: no se pudo conectar a internet para descargar {nombre_archivo}")
             return None
 
         if respuesta.status_code != 200:  # 200 = la respuesta llegó bien
-            print(f"Error: la API respondió con el código {respuesta.status_code} para {nombre_archivo}.")
+            print(f"Error: la API respondió con el código {respuesta.status_code} para {nombre_archivo}")
             return None
 
         try:
             return respuesta.json()
         except ValueError:
-            print(f"Error: {nombre_archivo} no tiene formato JSON válido.")
+            print(f"Error: {nombre_archivo} no tiene formato JSON válido")
             return None
